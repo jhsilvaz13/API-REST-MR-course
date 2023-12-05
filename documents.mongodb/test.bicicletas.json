@@ -1,0 +1,13 @@
+[{
+  "_id": {
+    "$oid": "656e645521cf97f4fe02f4b8"
+  },
+  "code": 1,
+  "color": "verde",
+  "modelo": "urbana",
+  "ubicacion": [
+    54,
+    4
+  ],
+  "__v": 0
+}]
