@@ -2,10 +2,11 @@ var mongoose = require('mongoose');
 var Reserva = require('./reserva');
 var Schema = mongoose.Schema;
 var bcrypt = require('bcrypt');
+var crypto = require('crypto');
 const saltRounds = 10;
 
 const Token = require('../models/token');
-//const mailer = require('../mailer/mailer');
+const mailer = require('../mailer/mailer');
 
 const validateEmail = function (email) {
     const re = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
@@ -69,25 +70,32 @@ usuarioSchema.methods.validPassword = function (aPassword) {
 }
 
 usuarioSchema.methods.enviar_email_bienvenida = function () {
-    /*const token= new Token({_userId: this.id, token: crypto.randomBytes(16).toString('hex')});
+    const token= new Token({_userId: this.id, token: crypto.randomBytes(16).toString('hex')});
     const email_destination = this.email;
-    token.save(function(err){
-        if(err){
-            return console.log(err.message);
-        }
-        const mailOptions={
-            from: 'no-reply@red.com',
+    console.log("email_destination: " + email_destination);
+    token.save()
+    .then(() => {
+        const mailOptions = {
+            from: 'no-reply@red-bicicletas.com',
             to: email_destination,
             subject: 'Verificacion de cuenta',
-            text: 'Hola,\n\n'+'Por favor, para verificar su cuenta haga click en este link: \n'+ 'http://localhost:3000'+'/token/confirmation/'+token.token+'\n'
+            text: 'Hola,\n\n' + 'Por favor, para verificar su cuenta haga click en este link: \n' + 'http://localhost:3000' + '/token/confirmation/' + token.token + '\n'
         };
-        mailer.sendMail(mailOptions, function(err){
-            if(err){return console.log(err.message);}
-            console.log('Se ha enviado un email de bienvenida a: '+email_destination+'.');
+        mailer.sendMail(mailOptions, function (err) {
+            if (err) { return console.log(err.message); }
+            console.log('Se ha enviado un email de bienvenida a: ' + email_destination + '.');
         });
-    }
-    );*/
-    return true;
+
+    })
+    .catch(err => console.log(err.message));
+}
+
+usuarioSchema.statics.login = function (email, password) {
+    return this.findOne({ email: email }).then(function (user) {
+        if (!user) return null;
+        if (!user.validPassword(password)) return null;
+        return user;
+    });
 }
 
 module.exports = mongoose.model('Usuario', usuarioSchema);

@@ -3,21 +3,26 @@ var Token = require('../models/token');
 
 module.exports = {
     confirmationGet: function (req, res, next) {
-        Token.findOne({ token: req.params.token }, (err, token) => {
+        
+        Token.findOne({token:req.params.token})
+        .then(token => {
             if (!token) return res.status(400).send({ type: 'not-verified', msg: 'No encontramos un usuario con este token. Quizas haya expirado.' });
 
-            Usuario.findById(token._userId, (err, usuario) => {
+            Usuario.findById(token._userId)
+            .then(usuario => {
                 if (!usuario) return res.status(400).send({ msg: 'No encontramos un usuario con este token.' });
                 if (usuario.verificado) return res.redirect('/usuarios');
 
                 usuario.verificado = true;
-                usuario.save(function (err) {
-                    if (err) { return res.status(500).send({ msg: err.message }); }
-                    res.redirect('/');
-                });
-            });
+                usuario.save()
+                .then(() => res.redirect('/'))
+                .catch(err => res.status(500).send({ msg: err.message }));
+            })
+            .catch(err => res.status(500).send({ msg: err.message }));
         }
-        );
+        )
+        .catch(err => res.status(500).send({ msg: err.message }));
+
     }
 };
         
