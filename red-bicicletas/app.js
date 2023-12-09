@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const config = require('./config/config');
-
+const jwt = require('jsonwebtoken');
 
 var indexRouter = require('./routes/index');
 var usuariosRouter = require('./routes/usuarios');
@@ -13,12 +13,14 @@ var bicicletasRouter = require('./routes/bicicletas');
 var bicicletasAPIRouter = require('./routes/api/bicicletas');
 var usuariosAPIRouter = require('./routes/api/usuarios');
 var sessionRouter = require('./routes/session');
+var authAPIRouter = require('./routes/api/auth');
 const passport = require('./config/passport');
 const session = require('express-session');
 
 const store = new session.MemoryStore;
 
 const SECRET_SESSION = config.secretSession;
+const SECRET_KEY = config.secretKey;
 
 var app = express();
 app.use(session({
@@ -41,14 +43,14 @@ app.use(cookieParser());
 app.use(passport.initialize()); // Inicializamos passport
 app.use(passport.session()); // Inicializamos la sesión de passport
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use('/', indexRouter);
 app.use('/usuarios', usuariosRouter);
 app.use('/token', tokenRouter);
 app.use ('/bicicletas', loggedIn,bicicletasRouter); 
-app.use('/api/bicicletas', bicicletasAPIRouter);
-app.use('/api/usuarios', usuariosAPIRouter);
+app.use('/api/bicicletas', validarUsuario,bicicletasAPIRouter);
+app.use('/api/usuarios',validarUsuario, usuariosAPIRouter);
 app.use('/session', sessionRouter);
+app.use('/api/auth', authAPIRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -73,6 +75,18 @@ function loggedIn(req, res, next){
     console.log('Usuario sin loguearse'+ req.usuario);
     res.redirect('/session/login');
   }
+}
+
+function validarUsuario(req, res, next){
+  jwt.verify(req.headers['x-access-token'], SECRET_KEY, function(err, decoded){
+    if(err){
+      res.json({status: "error", message: err.message, data: null});
+    } else {
+      req.body.userId = decoded.id;
+      console.log('jwt verify: '+ decoded);
+      next();
+    }
+  });
 }
 
 module.exports = app;
