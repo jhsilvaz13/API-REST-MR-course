@@ -42,3 +42,23 @@ exports.usuario_reservar = async function (req, res) {
         });
     }
 }
+
+exports.usuario_forgotPassword = async function (req, res) {
+    try{
+        var usuario= await Usuario.findOne({email: req.body.email});
+        if (usuario){
+            usuario.forgotPassword(usuario.email);
+            res.status(200).json({
+                message: 'Se envio un email para reestablecer el password'
+            });
+        }else{
+            res.status(404).json({
+                message: 'No existe el usuario'
+            });
+        }
+    }catch(err){
+        res.status(500).json({
+            message: err.message
+        });
+    }
+}

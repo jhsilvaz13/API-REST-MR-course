@@ -90,6 +90,23 @@ usuarioSchema.methods.enviar_email_bienvenida = function () {
     .catch(err => console.log(err.message));
 }
 
+usuarioSchema.methods.forgotPassword = function (aEmail) {
+    const token= new Token({_userId: this.id, token: crypto.randomBytes(16).toString('hex')});
+    const email_destination = aEmail;
+    token.save()
+    const mailOptions = {
+        from: 'no-reply@red-bicicletas.com',
+        to: email_destination,
+        subject: 'Reseteo de password de cuenta',
+        text: 'Hola,\n\n' + 'Por favor, para resetear el password de su cuenta haga click en este link: \n' + 'http://localhost:3000' + '/session/resetPassword/' + token.token + '\n'
+    };
+    mailer.sendMail(mailOptions, function (err) {
+        if (err) { return console.log(err.message); }
+        console.log('Se ha enviado un email de reseteo de password a: ' + email_destination + '.');
+    });
+}
+
+
 usuarioSchema.statics.login = function (email, password) {
     return this.findOne({ email: email }).then(function (user) {
         if (!user) return null;
@@ -97,5 +114,13 @@ usuarioSchema.statics.login = function (email, password) {
         return user;
     });
 }
+
+usuarioSchema.statics.resetPassword = function (_userId,newPassword) {
+    var usuario = this.findById(_userId);
+    this.findOneAndUpdate( {_id: _userId}, {password: newPassword});
+    return usuario;
+}
+
+
 
 module.exports = mongoose.model('Usuario', usuarioSchema);

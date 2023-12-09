@@ -5,5 +5,7 @@ var usuarioController = require('../../controllers/api/usuarioControllerAPI');
 router.get('/', usuarioController.usuarios_list);
 router.post('/create', usuarioController.usuario_create);
 router.post('/reservar', usuarioController.usuario_reservar);
+router.post('/forgotPassword', usuarioController.usuario_forgotPassword);
+
 
 module.exports = router;

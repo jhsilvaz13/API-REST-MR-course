@@ -1,4 +1,6 @@
 var Usuario = require('../models/usuario');
+var Token = require('../models/token');
+var passport = require('passport');
 
 module.exports = {
     list: function (req, res, next) {
@@ -20,7 +22,7 @@ module.exports = {
         Usuario.findByIdAndUpdate(req.params.id, update_values)
         .exec()
         .then(usuario => {
-            res.render('usuarios', { errors: {}, usuario: usuario });
+            res.render('/usuarios', { errors: {}, usuario: usuario });
             return;
         })
         .catch(err => {
@@ -56,13 +58,62 @@ module.exports = {
         res.render('session/login', { errors: {} });
     },
     login: function(req,res,next){
-        Usuario.login(req.body.email, req.body.password)
-        .then(user => {
-            res.redirect('/');
-        }).catch(err => {
-            res.render('session/login', {errors: [{message: 'Su email o password son incorrectos'}]});
-            console.log(err);
+        passport.authenticate('local', function(err,usuario,info){
+            if (err) return next(err);
+            if (!usuario) return res.render('session/login', {info});
+            req.logIn(usuario, function(err){
+                if (err) return next(err);
+                return res.redirect('/');
+            });
         }
-        )
+        )(req,res,next);
+    },
+    logout: function(req,res,next){
+        req.logout(function(err) {
+            if (err) { return next(err); }
+            res.redirect('/');
+          });
+    },
+    forgotPassword_get: function(req,res,next){
+        res.render('session/forgotPassword', { errors: {} });
+    },
+    forgotPassword: function(req,res,next){
+        passport.authenticate('local', {
+            successRedirect: '/',
+            failureRedirect: '/session/login',
+        })
+    },
+    resetPassword_get: function(req,res,next){
+        Token.findOne({token: req.params.token})
+        .then(token => {
+            if (!token) return res.status(400).send({type: 'not-verified', msg: 'No existe un usuario asociado al token. Verifique que su token no haya expirado'});
+            Usuario.findById(token._userId)
+            .then(usuario => {
+                if (!usuario) return res.status(400).send({msg: 'No existe un usuario asociado al token.'});
+                res.render('session/resetPassword', {errors: {}, usuario: usuario});
+            }).catch(err => {
+                res.status(500).send({msg: err.message});
+            });
+        }
+        ).catch(err => {
+            res.status(500).send({msg: err.message});
+        });
+    },
+    resetPassword: function(req,res,next){
+        Usuario.findOne({email: req.body.email})
+        .then(usuario => {
+            if (!usuario) return res.status(400).send({msg: 'No existe un usuario asociado al email.'});
+            usuario.password = req.body.password;
+            usuario.save()
+            .then(() => {
+                res.redirect('/session/login');
+            }).catch(err => {
+                res.render('session/resetPassword', {errors: err.errors, usuario: new Usuario({email: req.body.email})});
+            });
+        }
+        ).catch(err => {
+            res.status(500).send({msg: err.message});
+        });
     }
+
 };
