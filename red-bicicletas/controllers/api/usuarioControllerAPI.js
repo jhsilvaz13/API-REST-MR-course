@@ -14,19 +14,6 @@ exports.usuarios_list = async function (req, res) {
     }
 }
 
-exports.usuario_create = async function (req, res) {
-    try{
-        var usuario = new Usuario({code: req.body.code, nombre: req.body.nombre});
-        await Usuario.add(usuario);
-        res.status(200).json({
-            usuario: usuario
-        });
-    }catch(err){
-        res.status(500).json({
-            error: err,
-        });
-    }
-}
 
 exports.usuario_reservar = async function (req, res) {
     try{

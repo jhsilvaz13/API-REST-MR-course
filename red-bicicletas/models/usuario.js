@@ -69,8 +69,8 @@ usuarioSchema.methods.validPassword = function (aPassword) {
     return bcrypt.compareSync(aPassword, this.password);
 }
 
-usuarioSchema.methods.enviar_email_bienvenida = function () {
-    const token= new Token({_userId: this.id, token: crypto.randomBytes(16).toString('hex')});
+usuarioSchema.methods.enviar_email_bienvenida = function (aToken) {
+    const token= new Token({_userId: this.id, token: aToken});
     const email_destination = this.email;
     console.log("email_destination: " + email_destination);
     token.save()

@@ -21,3 +21,33 @@ exports.authenticate = async function (req, res, next) {
         });
     }
 };
+
+exports.signup = async function (req, res) {
+    try{
+        var usuario = new Usuario({code: req.body.code, nombre: req.body.nombre, email: req.body.email, password: req.body.password, verificado: false});
+        await Usuario.add(usuario);
+        const token=jwt.sign({id: usuario._id}, config.secretKey, {expiresIn: '60m'});
+        usuario.enviar_email_bienvenida(token);
+        res.status(200).json({
+            message: 'Usuario creado',
+            usuario: usuario,
+            token: token
+        });
+    }catch(err){
+        res.status(500).json({
+            error: err,
+            message: err.message
+        });
+    }
+}
+
+exports.logout = function (req, res) {
+    req.logout(
+        function (err) {
+            if (err) {
+                res.status(500).json({ status: "error" });
+            }
+            res.status(200).json({ status: "logout" });
+        }
+    );
+}
