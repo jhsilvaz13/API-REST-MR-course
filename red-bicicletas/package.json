@@ -6,9 +6,9 @@
     "start": "node ./bin/www",
     "devstart": "nodemon ./bin/www",
     "test": "jasmine"
-
   },
   "dependencies": {
+    "@types/js-base64": "^3.3.1",
     "bcrypt": "^5.1.1",
     "cookie-parser": "~1.4.4",
     "crypto": "^1.0.1",
