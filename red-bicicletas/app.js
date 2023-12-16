@@ -50,10 +50,10 @@ app.use("/", indexRouter);
 app.use("/usuarios", usuariosRouter);
 app.use("/token", tokenRouter);
 app.use("/bicicletas", loggedIn, bicicletasRouter);
-app.use("/api/bicicletas", validarUsuario, verificado, bicicletasAPIRouter);
+app.use("/api/bicicletas", validarUsuario, bicicletasAPIRouter);
 app.use("/api/usuarios", validarUsuario, usuariosAPIRouter);
 app.use("/session", sessionRouter);
-app.use("/api/auth", authAPIRouter);
+app.use("/api/auth", verificado, authAPIRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -97,7 +97,7 @@ function validarUsuario(req, res, next) {
 }
 
 async function verificado(req, res, next) {
-  var usuario = await Usuario.findById(req.body.userId).exec();
+  var usuario = await Usuario.findOne({ email: req.body.email });
   console.log("verificado: " + usuario);
   if (usuario.verificado) {
     next();
