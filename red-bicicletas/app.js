@@ -9,12 +9,12 @@ const jwt = require("jsonwebtoken");
 const Usuario = require("./models/usuario");
 
 var indexRouter = require("./routes/index");
-var usuariosRouter = require("./routes/usuarios");
+//var usuariosRouter = require("./routes/usuarios");
 var tokenRouter = require("./routes/token");
-var bicicletasRouter = require("./routes/bicicletas");
+//var bicicletasRouter = require("./routes/bicicletas");
 var bicicletasAPIRouter = require("./routes/api/bicicletas");
 var usuariosAPIRouter = require("./routes/api/usuarios");
-var sessionRouter = require("./routes/session");
+//var sessionRouter = require("./routes/session");
 var authAPIRouter = require("./routes/api/auth");
 const passport = require("./config/passport");
 const session = require("express-session");
@@ -47,12 +47,12 @@ app.use(passport.initialize()); // Inicializamos passport
 app.use(passport.session()); // Inicializamos la sesión de passport
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
-app.use("/usuarios", usuariosRouter);
+//app.use("/usuarios", usuariosRouter);
 app.use("/token", tokenRouter);
-app.use("/bicicletas", loggedIn, bicicletasRouter);
+//app.use("/bicicletas", loggedIn, bicicletasRouter);
 app.use("/api/bicicletas", validarUsuario, bicicletasAPIRouter);
 app.use("/api/usuarios", validarUsuario, usuariosAPIRouter);
-app.use("/session", sessionRouter);
+//app.use("/session", sessionRouter);
 app.use("/api/auth", verificado, authAPIRouter);
 
 // catch 404 and forward to error handler
