@@ -52,7 +52,7 @@ app.use("/token", tokenRouter);
 //app.use("/bicicletas", loggedIn, bicicletasRouter);
 app.use("/api/bicicletas", validarUsuario, bicicletasAPIRouter);
 app.use("/api/usuarios", validarUsuario, usuariosAPIRouter);
-app.use("/session", sessionRouter);
+//app.use("/session", sessionRouter);
 app.use("/api/auth", verificado, authAPIRouter);
 
 // catch 404 and forward to error handler
