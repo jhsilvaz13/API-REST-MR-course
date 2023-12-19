@@ -76,7 +76,7 @@ usuarioSchema.methods.enviar_email_bienvenida = function (aToken) {
     token.save()
     .then(() => {
         const mailOptions = {
-            from: 'no-reply@red-bicicletas.com',
+            from: 'jhonzabala1306@gmail.com',
             to: email_destination,
             subject: 'Verificacion de cuenta',
             text: 'Hola,\n\n' + 'Por favor, para verificar su cuenta haga click en este link: \n' + 'http://localhost:3000' + '/token/confirmation/' + token.token + '\n'
